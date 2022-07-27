@@ -1,8 +1,23 @@
 apply plugin: 'com.android.library'
-apply plugin: "com.jfrog.bintray"
+apply plugin: "maven-publish"
 
 // This is the library version used when deploying the artifact
 version = VERSION_NAME
+
+group = 'com.gitee.code1993'
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = 'com.gitee.code1993'
+                artifactId = 'ffmpeg-android-java'
+                version = '1.0.3'
+            }
+        }
+    }
+}
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion as Integer
@@ -58,31 +73,3 @@ artifacts {
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
-// https://github.com/bintray/gradle-bintray-plugin
-bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
-
-    configurations = ['archives']
-    pkg {
-        repo = "maven"
-        // it is the name that appears in bintray when logged
-        name = "ffmpeg-android"
-        websiteUrl = POM_URL
-        vcsUrl = POM_SCM_URL
-        licenses = ["GPL-3.0"]
-        publish = true
-        version {
-            gpg {
-                sign = true
-                passphrase = properties.getProperty("bintray.gpg.password")
-            }
-            mavenCentralSync {
-                sync = true
-                user = properties.getProperty("bintray.oss.user") //OSS user token
-                password = properties.getProperty("bintray.oss.password") //OSS user password
-                close = '1'
-            }
-        }
-    }
-}
